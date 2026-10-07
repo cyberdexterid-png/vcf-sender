@@ -1,0 +1,16 @@
+{
+  "users": {
+    "ashensamarasinghe3@gmail.com": {
+      "password": "admin",
+      "role": "admin",
+      "plan": "premium",
+      "dailySent": 0,
+      "lastReset": "2026-04-16"
+    }
+  },
+  "license_keys": [
+    "PRO-XA91-BB22",
+    "PRO-92JA-XMM1",
+    "PRO-10AM-02Z1"
+  ]
+}
