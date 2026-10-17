@@ -1,39 +1,60 @@
-const mongoose = require('mongoose');
 
-// Your securely hardcoded MongoDB Cloud Connection
-const MONGO_URI = "mongodb+srv://cybereditzznew_db_user:FDwkCnIIEOmEsCw3@cluster0vcf.ogisxj8.mongodb.net/whatsapp_saas?retryWrites=true&w=majority";
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
-// The Collection Schema inside MongoDB
-const licenseSchema = new mongoose.Schema({
-    key: String,
-    created: { type: Date, default: Date.now } // Tracks when the key was created
-});
+const DB_FILE = path.join(__dirname, "database.json");
 
-const LicenseKey = mongoose.model('LicenseKey', licenseSchema);
+function generateKey() {
+    const part1 = crypto.randomBytes(4)
+        .toString("hex").slice(0, 5).toUpperCase();
 
-async function generateKeys() {
+    const part2 = crypto.randomBytes(4)
+        .toString("hex").slice(0, 4).toUpperCase();
+
+    return `PRO-${part1}-${part2}`;
+}
+
+function generateKeys() {
     try {
-        await mongoose.connect(MONGO_URI);
-        console.log("✅ Authenticated with MongoDB ATLAS.");
-        console.log("🔥 Generating 5 New Admin PRO License Keys...\n");
+        let database = { users: {}, license_keys: [] };
 
-        for(let i=0; i<5; i++) {
-            // Generates a totally random key like: PRO-A1G7B-9XYZ
-            const randomChunk1 = Math.random().toString(36).substring(2, 7).toUpperCase();
-            const randomChunk2 = Math.random().toString(36).substring(2, 6).toUpperCase();
-            const newKey = `PRO-${randomChunk1}-${randomChunk2}`;
-            
-            await LicenseKey.create({ key: newKey });
-            console.log(`[+] SUCCESS: ${newKey}`);
+        if (fs.existsSync(DB_FILE)) {
+            database = JSON.parse(
+                fs.readFileSync(DB_FILE, "utf8")
+            );
         }
 
-        console.log("\n✅ Keys successfully injected into your cloud database!");
-        console.log("You can now give these to customers for them to paste into the 'Unlock Premium' tab.");
-        process.exit(0);
-        
-    } catch (err) {
-        console.error("Database Error:", err);
-        process.exit(1);
+        if (!Array.isArray(database.license_keys)) {
+            database.license_keys = [];
+        }
+
+        const existingKeys = new Set(database.license_keys);
+        const newKeys = [];
+
+        while (newKeys.length < 5) {
+            const key = generateKey();
+
+            if (!existingKeys.has(key)) {
+                existingKeys.add(key);
+                newKeys.push(key);
+            }
+        }
+
+        database.license_keys.push(...newKeys);
+
+        fs.writeFileSync(
+            DB_FILE,
+            JSON.stringify(database, null, 2),
+            "utf8"
+        );
+
+        console.log("Generated 5 new PRO license keys:\n");
+        newKeys.forEach(key => console.log(`[+] ${key}`));
+        console.log("\nSaved to database.json");
+    } catch (error) {
+        console.error("Error:", error.message);
+        process.exitCode = 1;
     }
 }
 
