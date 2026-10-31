@@ -10,6 +10,21 @@ button,input,textarea{font:inherit}button{cursor:pointer}.shell{width:min(1250px
 </style></head>
 <body><div class="shell">
 <header class="top"><div class="brand"><div class="logo">X</div><div><div class="eyebrow">LOCAL CONTACT WORKSPACE</div><h1>XHYPER VCF SENDER <span style="color:var(--cyan)">V2</span></h1><div class="sub">Phone-only contacts · manual WhatsApp handoff</div></div></div><span class="chip" id="apiStatus">No API required</span></header>
+<section class="panel" style="margin-bottom:17px">
+<h2>WhatsApp Linked Device 🔗</h2>
+<div class="muted">Pair your own WhatsApp account using an 8-digit pairing code. No QR scan and no API key required.</div>
+<div class="row" style="margin-top:12px;align-items:end">
+ <div class="field" style="flex:1;min-width:220px;margin:0"><label for="waPhone">Your WhatsApp number (country code + digits)</label><input id="waPhone" value="94" inputmode="numeric" placeholder="947XXXXXXXX"></div>
+ <button class="btn" id="pairBtn">Get pairing code</button>
+ <button class="btn secondary" id="disconnectBtn">Disconnect</button>
+</div>
+<div class="row" style="margin-top:12px;align-items:center">
+ <span class="status" id="waStatus">Disconnected</span>
+ <strong id="pairCode" style="font-size:24px;letter-spacing:5px;color:var(--cyan)">--------</strong>
+ <span class="muted" id="waHint">Enter your own number, then request a code.</span>
+</div>
+<div class="notice"><strong>On your phone:</strong> WhatsApp → Linked Devices → Link a Device → Link with phone number instead → enter the code shown here. Keep this app private; the local session files contain account credentials.</div>
+</section>
 <div class="layout">
 <section class="panel">
 <h2>Phone contact list</h2><div class="muted">Import VCF files. Contact names are ignored and never shown or included in messages.</div>
@@ -52,4 +67,24 @@ $('start').onclick=runQueue;
 $('reset').onclick=()=>{position=0;render();log('Queue reset.')};
 $('apiStatus').textContent='● No API required';
 render();
+
+async function refreshWhatsAppStatus(){
+ try{
+  const r=await fetch('/api/whatsapp/status',{cache:'no-store'});const d=await r.json();
+  $('waStatus').textContent=d.status==='connected'?'Connected':d.status==='pairing'?'Waiting for code':d.status==='connecting'?'Connecting…':d.status==='error'?'Error':'Disconnected';
+  $('waStatus').className='status '+(d.status==='connected'?'ok':'');
+  $('pairCode').textContent=d.pairingCode||'--------';
+  $('waHint').textContent=d.status==='connected'?'Your Linked Device is connected.':d.error||'Enter your number and request a pairing code.';
+ }catch(_e){$('waHint').textContent='Local server is not responding.'}
+}
+$('pairBtn').onclick=async()=>{
+ const phone=$('waPhone').value.replace(/\D/g,'');
+ if(phone.length<8||phone.length>15){$('waHint').textContent='Enter country code and phone number using digits only.';return}
+ $('pairBtn').disabled=true;$('waHint').textContent='Requesting pairing code…';
+ try{const r=await fetch('/api/whatsapp/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Pairing request failed');$('waHint').textContent=d.message;await refreshWhatsAppStatus()}
+ catch(e){$('waHint').textContent=e.message}
+ finally{$('pairBtn').disabled=false}
+};
+$('disconnectBtn').onclick=async()=>{await fetch('/api/whatsapp/disconnect',{method:'POST'});await refreshWhatsAppStatus()};
+refreshWhatsAppStatus();setInterval(refreshWhatsAppStatus,2000);
 </script></body></html>
