@@ -2,7 +2,7 @@
   "name": "xhyper-vcf-sender-v2",
   "version": "2.0.0",
   "private": true,
-  "description": "Local-first VCF contact manager with consent-based WhatsApp chat handoff",
+  "description": "Local VCF contact manager with WhatsApp Linked Device pairing and manual opt-in chat handoff",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -11,6 +11,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "@whiskeysockets/baileys": "^6.7.18"
   }
 }
