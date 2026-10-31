@@ -6,6 +6,7 @@ Local-first VCF contact utility with WhatsApp Linked Device QR-code connection. 
 - Connect your own WhatsApp account by scanning a Linked Device QR code (Baileys).
 - Persist the linked-device session locally in `auth_data_local/`.
 - Show connection status and disconnect the active socket.
+- Automatically restart the Baileys socket after WhatsApp's expected post-QR-link `515` restart signal, after saving updated credentials.
 - Import multiple VCF/vCard files; parse phone numbers only and ignore contact names.
 - Normalize and deduplicate phone numbers.
 - Manually mark recipients only after they explicitly opt in.
