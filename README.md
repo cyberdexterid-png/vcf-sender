@@ -1,9 +1,9 @@
 # XHYPER VCF SENDER V2
 
-Local-first VCF contact utility with WhatsApp Linked Device pairing by phone-number pairing code. No WhatsApp Business API key is required.
+Local-first VCF contact utility with WhatsApp Linked Device QR-code connection. No WhatsApp Business API key is required.
 
 ## Features
-- Pair your own WhatsApp account using an 8-digit Linked Device pairing code (Baileys).
+- Connect your own WhatsApp account by scanning a Linked Device QR code (Baileys).
 - Persist the linked-device session locally in `auth_data_local/`.
 - Show connection status and disconnect the active socket.
 - Import multiple VCF/vCard files; parse phone numbers only and ignore contact names.
@@ -23,12 +23,11 @@ npm start
 
 Open http://127.0.0.1:3000
 
-## Pair your phone
+## Connect your phone
 1. Start the local app.
-2. Enter your own WhatsApp phone number with country code, digits only (Sri Lanka example: 947XXXXXXXX).
-3. Click **Get pairing code**.
-4. On your phone, open WhatsApp → Linked Devices → Link a Device → Link with phone number instead.
-5. Enter the code displayed in the app.
+2. Click **Connect WhatsApp**.
+3. On your phone, open WhatsApp → Linked Devices → Link a Device.
+4. Scan the QR code displayed in the app.
 
 The session is stored in `auth_data_local/` and reused after restart. Keep that folder private and never commit or share it. This is an unofficial WhatsApp Web client library, not the official WhatsApp Business API; WhatsApp may change or restrict unofficial clients.
 
