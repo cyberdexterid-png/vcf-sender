@@ -1,33 +1,53 @@
 # XHYPER VCF SENDER V2
 
-A free, local-first VCF contact utility. No account, login, database, or remote contact storage.
+A local-first, phone-number-only contact workflow using the official WhatsApp Business Cloud API.
 
 ## Features
-- Import multiple VCF/vCard files in the browser
-- Parse contact names and phone numbers
-- Detect duplicate phone numbers and remove duplicates from the working list
-- Validate phone-number format (format validation is **not** WhatsApp account detection)
-- Manually mark contacts only when you have permission to message them
-- Personalize a message with the `{name}` placeholder
-- Open one approved contact's WhatsApp chat at a time; review and press Send yourself
-- Export a cleaned VCF file
-- Contact data remains in the browser tab and is not sent to this server
+- Import multiple VCF/vCard files; **contact names are ignored** and never displayed or sent.
+- Normalize and deduplicate phone numbers.
+- Manually confirm recipient opt-in before a number enters the queue.
+- Prepare a friendly Sinhala message without personalizing it with contact names.
+- Start, pause, resume, and stop a queue for consent-confirmed recipients.
+- Sends through the official WhatsApp Business Cloud API; no personal Linked Device automation.
+- Local pacing limit of one message every 30 seconds and a per-session duplicate-recipient guard.
+- Export a phone-only VCF file.
+- Contact data stays in the browser; the server receives only the current recipient and message when sending.
 
-## Run locally
-Requires Node.js 20 or newer.
+## Requirements
+- Node.js 20 or newer
+- A Meta business app configured for WhatsApp Cloud API
+- A WhatsApp Business sender phone-number ID and access token
+- A supported Graph API version
 
-```bash
+Set these environment variables before starting the server:
+
+- `WHATSAPP_TOKEN`
+- `WHATSAPP_PHONE_NUMBER_ID`
+- `WHATSAPP_GRAPH_API_VERSION` (for example, the currently supported version in your Meta app)
+
+### Windows PowerShell example
+
+```powershell
+$env:WHATSAPP_TOKEN="YOUR_ACCESS_TOKEN"
+$env:WHATSAPP_PHONE_NUMBER_ID="YOUR_PHONE_NUMBER_ID"
+$env:WHATSAPP_GRAPH_API_VERSION="YOUR_SUPPORTED_GRAPH_VERSION"
 npm install
 npm start
 ```
 
 Open http://127.0.0.1:3000
 
-## Important limitations
-- The app cannot reliably determine whether a phone number has a WhatsApp account.
-- It does not automate sending, probe accounts, randomize messages to evade anti-spam systems, or promise ban avoidance.
-- Only message people who have clearly agreed to receive your messages. Respect opt-outs.
-- The default server binds to 127.0.0.1. Do not expose this local utility publicly without adding appropriate security controls.
+## WhatsApp policy and limitations
+- Use only for people who explicitly opted in to receive messages from you.
+- Do not import scraped, purchased, or unsolicited contact lists.
+- Respect opt-outs immediately.
+- The Cloud API may require an approved message template when messaging outside the 24-hour customer-service window.
+- A phone-number format check does not establish whether the recipient uses WhatsApp.
+- The local 30-second pacing limit is a conservative app guard, **not** a way to avoid enforcement or a guarantee against restrictions.
+- This project does not automate a personal Linked Device, probe WhatsApp accounts, or randomize messages to disguise bulk outreach.
 
-## Privacy
-VCF parsing, contact selection, previews, and export run in the browser. The server only serves the static application and a health endpoint.
+## Privacy and security
+- Bind to 127.0.0.1 by default.
+- Never commit access tokens to GitHub. Set secrets as environment variables.
+- This minimal local app has no login; do not expose it publicly.
+- The in-memory sending guard resets when the server restarts.
