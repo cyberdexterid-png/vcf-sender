@@ -2,79 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Safe Sender PRO — Local Dashboard</title>
-<script src="/socket.io/socket.io.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d18">
+<title>XHYPER VCF SENDER V2</title>
 <style>
-:root{color-scheme:dark;--cyan:#00d2ff;--blue:#3a7bd5;--bg:#030811;--panel:rgba(10,25,45,.72);--border:rgba(0,210,255,.25);--muted:#88a0b0}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 15% 20%,#06304a 0,transparent 32%),radial-gradient(circle at 85% 80%,#101d49 0,transparent 30%),var(--bg);color:#f0f8ff;font:16px system-ui,Segoe UI,sans-serif;display:grid;place-items:center;padding:20px}
-main{width:min(760px,100%);padding:clamp(22px,5vw,42px);border:1px solid var(--border);border-radius:24px;background:var(--panel);box-shadow:0 8px 40px #00d2ff12;backdrop-filter:blur(20px)}
-.tag{display:inline-block;padding:6px 11px;border-radius:999px;background:#123c35;color:#a7f3d0;font-size:12px;letter-spacing:1px;font-weight:700}
-h1{font-size:clamp(28px,5vw,42px);margin:16px 0 8px;background:linear-gradient(120deg,#fff,var(--cyan));color:transparent;background-clip:text}
-p{color:#b6c8d8;line-height:1.6}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
-button{border:0;border-radius:12px;padding:13px 18px;font-weight:700;cursor:pointer;background:linear-gradient(120deg,var(--cyan),var(--blue));color:#00121b}
-button.secondary{background:#102337;border:1px solid var(--border);color:#e9faff}
-button:disabled{opacity:.55;cursor:wait}
-pre{min-height:100px;white-space:pre-wrap;overflow-wrap:anywhere;background:#02060d;border:1px solid #1c3044;border-radius:12px;padding:16px;color:#a9f5ff}
-small{color:var(--muted)}.note{border-left:3px solid var(--cyan);padding-left:13px}
+:root{color-scheme:dark;--bg:#080d18;--panel:#101a2b;--panel2:#0c1422;--line:#22344b;--text:#edf5ff;--muted:#91a5bc;--cyan:#35d7ef;--blue:#6385ff;--green:#46d6a0;--red:#ff7185}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#102e48 0,transparent 38%),radial-gradient(ellipse at 95% 85%,#201b48 0,transparent 34%),var(--bg);color:var(--text);font:15px Inter,ui-sans-serif,system-ui,Segoe UI,sans-serif;min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.shell{width:min(1440px,100%);margin:auto;padding:26px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:14px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;color:#06111e;font-weight:900;font-size:20px;box-shadow:0 8px 30px #35d7ef35}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--cyan);font-weight:800}.brand h1{font-size:21px;margin:3px 0}.sub{color:var(--muted);font-size:13px}.top-right{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#0c1726;border-radius:99px;padding:8px 12px;color:#b7c8dc;font-size:12px}.chip b{color:var(--green)}.layout{display:grid;grid-template-columns: minmax(0,1.45fr) minmax(320px,.85fr);gap:18px}.panel{background:linear-gradient(160deg,#121f32ed,#0d1625f2);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 55px #0003;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.muted{color:var(--muted);font-size:13px;line-height:1.5}.upload{border:1px dashed #3d6680;background:#0b1b2a;border-radius:15px;padding:25px;text-align:center;margin:17px 0;transition:.2s}.upload.drag{border-color:var(--cyan);background:#102b3b}.upload .glyph{font-size:28px;margin-bottom:7px}.btn{border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--cyan),#6991ff);color:#071321;font-weight:800}.btn.secondary{background:#17263a;color:#d9e8f8;border:1px solid #2b405a}.btn.ghost{background:transparent;color:#9fc4df;border:1px solid var(--line)}.btn.danger{background:#3a1d2b;color:#ffb5c0;border:1px solid #673044}.btn:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.stat{background:#0b1422;border:1px solid #1d3045;border-radius:13px;padding:13px}.stat strong{display:block;font-size:22px;margin-bottom:3px}.stat span{font-size:11px;color:var(--muted)}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:17px 0 10px;flex-wrap:wrap}.search{background:#0a1421;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);min-width:190px;outline:none}.search:focus,textarea:focus,select:focus{border-color:var(--cyan)}.table-wrap{overflow:auto;border:1px solid #203248;border-radius:13px;max-height:440px}table{border-collapse:collapse;width:100%;min-width:580px}th,td{text-align:left;padding:12px 11px;border-bottom:1px solid #1b2b3e;font-size:12px}th{position:sticky;top:0;background:#101d2d;color:#9db3c9;z-index:1}td{color:#dce8f5}tr:last-child td{border-bottom:0}.status{font-size:10px;border-radius:99px;padding:4px 7px;background:#273244;color:#c6d3e1}.status.ok{background:#12382f;color:#81edc4}.status.unknown{background:#302b1d;color:#f5d88c}.check{accent-color:var(--cyan);width:16px;height:16px}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:12px;color:#a9bdd2;font-weight:700}.field textarea,.field input,.field select{width:100%;background:#091321;border:1px solid #263950;border-radius:11px;color:var(--text);padding:11px 12px;outline:none}.field textarea{min-height:125px;resize:vertical;line-height:1.5}.preview{white-space:pre-wrap;background:#08121e;border:1px solid #1e354b;border-radius:12px;padding:13px;min-height:80px;color:#cde4f5;font-size:13px;line-height:1.6}.notice{background:#282417;border:1px solid #594b27;color:#e8d9a7;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin:14px 0}.notice strong{color:#ffe8a1}.progress{height:7px;background:#1b2b3e;border-radius:99px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .2s}.empty{text-align:center;padding:34px 12px;color:var(--muted)}.footer{color:#71869d;font-size:11px;text-align:center;margin:20px 0 5px}.hidden{display:none!important}@media(max-width:900px){.layout{grid-template-columns:1fr}.shell{padding:17px}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.top{align-items:flex-start;flex-direction:column}.top-right{width:100%}.panel{padding:15px}.stats{gap:7px}.stat{padding:10px}.stat strong{font-size:19px}.upload{padding:18px}.btn{padding:10px 12px}}
 </style>
 </head>
 <body>
-<main>
-<span class="tag">LOCAL MODE · NO LOGIN</span>
-<h1>Safe Sender PRO</h1>
-<p>This dashboard opens directly. Google login and MongoDB are not required for this local build.</p>
-<div class="actions">
-<button id="check">Check server</button>
-<button id="connect" class="secondary">Connect WhatsApp</button>
+<div class="shell">
+<header class="top">
+ <div class="brand"><div class="logo">X</div><div><div class="eyebrow">LOCAL CONTACT WORKSPACE</div><h1>XHYPER VCF SENDER <span style="color:var(--cyan)">V2</span></h1><div class="sub">Private VCF tools · no account · no database</div></div></div>
+ <div class="top-right"><span class="chip"><b>●</b> Local mode</span><span class="chip">Data stays in this browser</span></div>
+</header>
+<div class="layout">
+<section class="panel">
+ <h2>Contact workspace</h2><div class="muted">Import VCF contacts, review and clean the list, then mark only people who have agreed to receive your message.</div>
+ <div class="upload" id="drop">
+  <div class="glyph">📇</div><strong>Drop VCF files here</strong><div class="muted" style="margin:6px 0 13px">Supports .vcf and .vcard · multiple files</div>
+  <input id="files" type="file" accept=".vcf,.vcard,text/vcard" multiple hidden>
+  <button class="btn" id="browse">Choose VCF files</button>
+ </div>
+ <div class="stats">
+  <div class="stat"><strong id="total">0</strong><span>Total contacts</span></div>
+  <div class="stat"><strong id="valid">0</strong><span>Valid phone formats</span></div>
+  <div class="stat"><strong id="dupes">0</strong><span>Duplicates removed</span></div>
+  <div class="stat"><strong id="consented">0</strong><span>Consent confirmed</span></div>
+ </div>
+ <div class="toolbar"><div><strong style="font-size:13px">Imported contacts</strong><div class="muted" id="listHint">No contacts loaded yet</div></div><input class="search" id="search" placeholder="Search name or number…" aria-label="Search contacts"></div>
+ <div class="table-wrap">
+  <table><thead><tr><th><input class="check" id="selectVisible" type="checkbox" aria-label="Select visible"></th><th>Name</th><th>Phone</th><th>Format</th><th>Consent</th></tr></thead><tbody id="contacts"><tr><td colspan="5"><div class="empty">Upload a VCF file to get started.</div></td></tr></tbody></table>
+ </div>
+ <div class="row" style="margin-top:13px"><button class="btn secondary" id="export" disabled>Export cleaned VCF</button><button class="btn ghost" id="clear" disabled>Clear contacts</button><span class="muted" id="fileInfo"></span></div>
+</section>
+<aside class="panel">
+ <h2>Message studio</h2><div class="muted">Prepare a message and open a chat for one consent-confirmed contact at a time.</div>
+ <div class="notice"><strong>WhatsApp availability:</strong> A phone-number format check cannot confirm that a number has WhatsApp. The app will not probe accounts or label numbers as WhatsApp users. Availability is shown as unknown until you confirm it yourself.</div>
+ <div class="field"><label for="country">Default country calling code (digits only)</label><input id="country" value="94" inputmode="numeric" maxlength="4"></div>
+ <div class="field"><label for="message">Message template</label><textarea id="message" placeholder="Hi {name}, just following up about…"></textarea><div class="muted">Use {name} to insert the contact's name. Keep messages relevant and expected.</div></div>
+ <div class="field"><label for="preview">Preview for selected contact</label><div class="preview" id="preview">Select a contact to preview your message.</div></div>
+ <div class="row"><button class="btn" id="openChat" disabled>Open next approved chat ↗</button><button class="btn secondary" id="copyMsg" disabled>Copy message</button></div>
+ <div class="progress"><i id="progress"></i></div>
+ <div class="muted" id="queueText">0 approved contacts in your send queue.</div>
+ <div class="notice" style="background:#14251f;border-color:#244b3b;color:#b5e7d1"><strong>Safe workflow:</strong> Each chat opens for your review. You must press Send in WhatsApp yourself. There is no auto-send, account checking, message randomization for ban evasion, or ban-bypass feature.</div>
+ <div class="field"><label>Message variants (manual selection)</label><select id="variant"><option value="0">Template 1 — Main message</option><option value="1">Template 2 — Friendly follow-up</option><option value="2">Template 3 — Short reminder</option></select><textarea id="variantText" placeholder="Optional alternative message template" style="min-height:75px"></textarea><button class="btn ghost" id="useVariant">Use selected template</button></div>
+</aside>
 </div>
-<h3>System status</h3>
-<pre id="status">Ready. Press “Check server” to test the backend.</pre>
-<p class="note">For local use, open <b>http://127.0.0.1:3000</b> on the same computer running the server.</p>
-<small>This minimal page supports server health checks and the backend's WhatsApp connection event. It does not implement bulk messaging, contact scraping, or Google Contacts access.</small>
-</main>
+<div class="footer">XHYPER VCF SENDER V2 · Local-first · No login · No remote contact storage</div>
+</div>
 <script>
-const statusBox = document.getElementById('status');
-const checkButton = document.getElementById('check');
-const connectButton = document.getElementById('connect');
-let socket = null;
-
-checkButton.addEventListener('click', async () => {
-  checkButton.disabled = true;
-  try {
-    const response = await fetch('/health', { cache: 'no-store' });
-    const data = await response.json();
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    statusBox.textContent = 'Server is running.\n' + JSON.stringify(data, null, 2);
-  } catch (error) {
-    statusBox.textContent = 'Server check failed: ' + error.message +
-      '\nCheck that npm start is running and that you opened http://127.0.0.1:3000.';
-  } finally {
-    checkButton.disabled = false;
+const $ = id => document.getElementById(id);
+let contacts = [];
+let duplicateCount = 0;
+let approvedQueue = [];
+let queueIndex = 0;
+let activeTemplate = '';
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function unfold(text){return text.replace(/\r?\n[ \t]/g,'');}
+function unescapeVcard(value){return value.replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');}
+function parseVcf(text){
+ const cards = unfold(text).split(/BEGIN:VCARD/i).slice(1);
+ const out=[];
+ for(const raw of cards){
+  const body=raw.split(/END:VCARD/i)[0];
+  const lines=body.split(/\r?\n/);
+  let name='', phone='';
+  for(const line of lines){
+   const idx=line.indexOf(':'); if(idx<0) continue;
+   const key=line.slice(0,idx).split(';')[0].toUpperCase();
+   const val=unescapeVcard(line.slice(idx+1).trim());
+   if(key==='FN' && !name) name=val;
+   if(key==='N' && !name){const p=val.split(';').filter(Boolean);name=[p[1],p[0]].filter(Boolean).join(' ');}
+   if(key==='TEL' && !phone) phone=val.replace(/[^+\d]/g,'');
   }
-});
-
-connectButton.addEventListener('click', () => {
-  if (typeof window.io !== 'function') {
-    statusBox.textContent = 'Socket.IO client could not load. Restart the server and refresh this page.';
-    return;
-  }
-  connectButton.disabled = true;
-  statusBox.textContent = 'Requesting WhatsApp connection…';
-  socket = socket || window.io();
-  socket.off('info');
-  socket.off('wa_connected');
-  socket.on('info', message => {
-    statusBox.textContent = typeof message === 'string' ? message : JSON.stringify(message);
-    connectButton.disabled = false;
-  });
-  socket.on('wa_connected', () => {
-    statusBox.textContent = 'WhatsApp connected.';
-    connectButton.disabled = false;
-  });
-  socket.emit('connect_whatsapp');
-  setTimeout(() => { connectButton.disabled = false; }, 10000);
-});
+  if(phone) out.push({id:crypto.randomUUID(),name:name||'Unknown contact',phone,consent:false,waKnown:false});
+ }
+ return out;
+}
+function normalizePhone(phone){
+ let digits=String(phone).replace(/\D/g,'');
+ const cc=$('country').value.replace(/\D/g,'');
+ if(!digits) return '';
+ if(String(phone).trim().startsWith('+')) return digits;
+ if(cc && digits.startsWith('0')) return cc+digits.slice(1);
+ if(cc && digits.length<=10 && !digits.startsWith(cc)) return cc+digits;
+ return digits;
+}
+function isValid(phone){const n=normalizePhone(phone);return n.length>=8&&n.length<=15;}
+function filtered(){const q=$('search').value.toLowerCase();return contacts.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));}
+function render(){
+ const rows=filtered();
+ $('contacts').innerHTML=rows.length?rows.map(c=>'<tr><td><input class="check row-check" data-id="'+c.id+'" type="checkbox" '+(c.consent?'checked':'')+' aria-label="Consent confirmed for '+escapeHtml(c.name)+'"></td><td>'+escapeHtml(c.name)+'</td><td>'+escapeHtml(c.phone)+'</td><td><span class="status '+(isValid(c.phone)?'ok':'')+'">'+(isValid(c.phone)?'Valid format':'Review')+'</span></td><td><span class="status '+(c.consent?'ok':'unknown')+'">'+(c.consent?'Confirmed':'Not confirmed')+'</span></td></tr>').join(''):'<tr><td colspan="5"><div class="empty">No matching contacts.</div></td></tr>';
+ $('total').textContent=contacts.length;
+ $('valid').textContent=contacts.filter(c=>isValid(c.phone)).length;
+ $('dupes').textContent=duplicateCount;
+ $('consented').textContent=contacts.filter(c=>c.consent).length;
+ $('listHint').textContent=contacts.length?rows.length+' shown · '+contacts.length+' total':'No contacts loaded yet';
+ $('export').disabled=!contacts.length;$('clear').disabled=!contacts.length;
+ $('selectVisible').checked=rows.length>0&&rows.every(c=>c.consent);
+ approvedQueue=contacts.filter(c=>c.consent&&isValid(c.phone));
+ $('queueText').textContent=approvedQueue.length+' approved contacts in your send queue.';
+ $('openChat').disabled=!approvedQueue.length||!$('message').value.trim();
+ $('copyMsg').disabled=!approvedQueue.length||!$('message').value.trim();
+ updatePreview();
+}
+function currentContact(){return approvedQueue[queueIndex%Math.max(approvedQueue.length,1)];}
+function messageFor(c){return $('message').value.replaceAll('{name}',c?.name||'there').trim();}
+function updatePreview(){const c=currentContact();$('preview').textContent=c?messageFor(c):'Select a contact and confirm consent to preview your message.';$('progress').style.width=approvedQueue.length?(Math.min(queueIndex,approvedQueue.length)/approvedQueue.length*100)+'%':'0%';}
+async function importFiles(files){
+ for(const file of files){try{const text=await file.text();const parsed=parseVcf(text);const seen=new Set(contacts.map(c=>normalizePhone(c.phone)));for(const c of parsed){const key=normalizePhone(c.phone);if(!key||seen.has(key)){duplicateCount++;continue;}seen.add(key);contacts.push(c);}}catch(e){alert('Could not read '+file.name+': '+e.message);}}
+ $('fileInfo').textContent=files.length+' file(s) processed';render();
+}
+$('browse').onclick=()=>$('files').click();
+$('files').onchange=e=>importFiles([...e.target.files]);
+$('drop').ondragover=e=>{e.preventDefault();$('drop').classList.add('drag')};
+$('drop').ondragleave=()=>$('drop').classList.remove('drag');
+$('drop').ondrop=e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files].filter(f=>/\.vcf$|\.vcard$/i.test(f.name)))};
+$('contacts').onchange=e=>{const box=e.target.closest('.row-check');if(!box)return;const c=contacts.find(x=>x.id===box.dataset.id);if(c)c.consent=box.checked;render()};
+$('selectVisible').onchange=e=>{const ids=new Set(filtered().map(c=>c.id));contacts.forEach(c=>{if(ids.has(c.id))c.consent=e.target.checked});render()};
+$('search').oninput=render;
+$('country').oninput=render;
+$('message').oninput=render;
+$('clear').onclick=()=>{if(confirm('Clear all imported contacts from this page?')){contacts=[];duplicateCount=0;queueIndex=0;$('fileInfo').textContent='';render();}};
+$('export').onclick=()=>{
+ const lines=['BEGIN:VCARD','VERSION:3.0'];
+ const v=contacts.map(c=>'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:'+c.name.replace(/[\r\n]/g,' ')+'\r\nTEL;TYPE=CELL:+'+normalizePhone(c.phone)+'\r\nEND:VCARD').join('\r\n');
+ const blob=new Blob([v+'\r\n'],{type:'text/vcard;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='xhyp er-cleaned-contacts.vcf'.replace(' ','');a.click();URL.revokeObjectURL(a.href);
+};
+$('openChat').onclick=()=>{
+ const c=currentContact();if(!c)return;
+ const msg=messageFor(c);if(!msg)return;
+ const url='https://wa.me/'+normalizePhone(c.phone)+'?text='+encodeURIComponent(msg);
+ window.open(url,'_blank','noopener,noreferrer');
+ queueIndex=Math.min(queueIndex+1,approvedQueue.length);
+ updatePreview();$('queueText').textContent='Opened '+Math.min(queueIndex,approvedQueue.length)+' of '+approvedQueue.length+' approved chats. Press Send in WhatsApp yourself.';
+};
+$('copyMsg').onclick=async()=>{const c=currentContact();if(c){await navigator.clipboard.writeText(messageFor(c));$('copyMsg').textContent='Copied ✓';setTimeout(()=>$('copyMsg').textContent='Copy message',1400)}};
+$('useVariant').onclick=()=>{const text=$('variantText').value.trim();if(text){$('message').value=text;render();}};
+$('variant').onchange=()=>{const samples=['Hi {name}, just following up on the information you asked for.','Hello {name}, hope you are doing well. Is this still a good time to connect?','Hi {name}, a quick reminder about our previous conversation.'];$('variantText').value=samples[Number($('variant').value)]||'';};
+render();
 </script>
 </body>
 </html>
