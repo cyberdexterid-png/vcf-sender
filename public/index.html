@@ -67,9 +67,15 @@ $('reset').onclick=()=>{position=0;render();log('Queue reset.')};
 $('apiStatus').textContent='● No API required';
 render();
 
+async function readJsonResponse(response){
+ const raw=await response.text();
+ if(!raw.trim())throw new Error('Server returned an empty response (HTTP '+response.status+'). Check the Codespaces terminal.');
+ try{return JSON.parse(raw)}catch(_e){throw new Error('Server returned non-JSON data (HTTP '+response.status+'). Restart the Codespace server and reload this page.')}
+}
 async function refreshWhatsAppStatus(){
  try{
-  const r=await fetch('/api/whatsapp/status',{cache:'no-store'});const d=await r.json();
+  const r=await fetch('/api/whatsapp/status',{cache:'no-store'});const d=await readJsonResponse(r);
+  if(!r.ok)throw new Error(d.error||'Status request failed (HTTP '+r.status+').');
   $('waStatus').textContent=d.status==='connected'?'Connected':d.status==='pairing'?'Scan QR code':d.status==='connecting'?'Connecting…':d.status==='error'?'Error':'Disconnected';
   $('waStatus').className='status '+(d.status==='connected'?'ok':'');
   if(d.qrCodeDataUrl){$('waQr').src=d.qrCodeDataUrl;$('waQr').classList.remove('hidden')}
@@ -79,10 +85,10 @@ async function refreshWhatsAppStatus(){
 }
 $('pairBtn').onclick=async()=>{
  $('pairBtn').disabled=true;$('waHint').textContent='Starting WhatsApp connection…';
- try{const r=await fetch('/api/whatsapp/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const d=await r.json();if(!r.ok)throw new Error(d.error||'Connection request failed');$('waHint').textContent=d.message;await refreshWhatsAppStatus()}
+ try{const r=await fetch('/api/whatsapp/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});const d=await readJsonResponse(r);if(!r.ok)throw new Error(d.error||'Connection request failed (HTTP '+r.status+').');$('waHint').textContent=d.message;await refreshWhatsAppStatus()}
  catch(e){$('waHint').textContent=e.message}
  finally{$('pairBtn').disabled=false}
 };
-$('disconnectBtn').onclick=async()=>{await fetch('/api/whatsapp/disconnect',{method:'POST'});await refreshWhatsAppStatus()};
+$('disconnectBtn').onclick=async()=>{try{const r=await fetch('/api/whatsapp/disconnect',{method:'POST'});await readJsonResponse(r);await refreshWhatsAppStatus()}catch(e){$('waHint').textContent=e.message}};
 refreshWhatsAppStatus();setInterval(refreshWhatsAppStatus,2000);
 </script></body></html>
