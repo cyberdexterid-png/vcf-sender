@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "express": "^5.2.1",
-    "@whiskeysockets/baileys": "^6.7.18"
+    "@whiskeysockets/baileys": "^6.7.18",
+    "qrcode": "^1.5.4"
   }
 }
