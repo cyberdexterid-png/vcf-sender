@@ -8,7 +8,7 @@ const AUTH_DIR = path.join(__dirname, "auth_data_local");
 
 let socket = null;
 let waStatus = "disconnected";
-let pairingCode = null;
+let qrCodeDataUrl = null;
 let pairedNumber = null;
 let lastError = null;
 let starting = false;
@@ -26,7 +26,7 @@ app.get("/health", (_req, res) => {
 
 app.get("/api/whatsapp/status", (_req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ status: waStatus, pairingCode, phone: pairedNumber, error: lastError });
+  res.json({ status: waStatus, qrCodeDataUrl, error: lastError });
 });
 
 app.post("/api/whatsapp/pair", async (req, res) => {
@@ -39,8 +39,7 @@ app.post("/api/whatsapp/pair", async (req, res) => {
   }
 
   starting = true;
-  pairingCode = null;
-  pairedNumber = phone;
+  qrCodeDataUrl = null;
   lastError = null;
   waStatus = "connecting";
 
@@ -59,31 +58,32 @@ app.post("/api/whatsapp/pair", async (req, res) => {
       const { connection, lastDisconnect, qr } = update;
       if (connection === "open") {
         waStatus = "connected";
-        pairingCode = null;
+        qrCodeDataUrl = null;
         lastError = null;
         starting = false;
       } else if (connection === "close") {
         waStatus = "disconnected";
-        pairingCode = null;
+        qrCodeDataUrl = null;
         starting = false;
         const reason = lastDisconnect?.error?.message;
         if (reason) lastError = reason;
         socket = null;
       }
-      if (qr && !state.creds.registered && !pairingCode) {
+      if (qr && !state.creds.registered) {
         try {
-          pairingCode = await socket.requestPairingCode(phone);
+          const QRCode = (await import("qrcode")).default;
+          qrCodeDataUrl = await QRCode.toDataURL(qr, { width: 280, margin: 2 });
           waStatus = "pairing";
           starting = false;
         } catch (error) {
-          lastError = error?.message || "Could not generate pairing code.";
+          lastError = error?.message || "Could not generate QR code.";
           waStatus = "error";
           starting = false;
         }
       }
     });
 
-    return res.json({ ok: true, message: state.creds.registered ? "Saved session is reconnecting." : "Request received. Pairing code will appear shortly." });
+    return res.json({ ok: true, message: state.creds.registered ? "Saved session is reconnecting." : "Connection started. Your QR code will appear shortly." });
   } catch (error) {
     starting = false;
     waStatus = "error";
@@ -98,7 +98,7 @@ app.post("/api/whatsapp/disconnect", async (_req, res) => {
   } catch (_error) {}
   socket = null;
   starting = false;
-  pairingCode = null;
+  qrCodeDataUrl = null;
   waStatus = "disconnected";
   return res.json({ ok: true, status: waStatus });
 });
