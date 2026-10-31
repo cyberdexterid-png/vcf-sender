@@ -1,148 +1,54 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080d18">
-<title>XHYPER VCF SENDER V2</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d18"><title>XHYPER VCF SENDER V2</title>
 <style>
-:root{color-scheme:dark;--bg:#080d18;--panel:#101a2b;--panel2:#0c1422;--line:#22344b;--text:#edf5ff;--muted:#91a5bc;--cyan:#35d7ef;--blue:#6385ff;--green:#46d6a0;--red:#ff7185}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#102e48 0,transparent 38%),radial-gradient(ellipse at 95% 85%,#201b48 0,transparent 34%),var(--bg);color:var(--text);font:15px Inter,ui-sans-serif,system-ui,Segoe UI,sans-serif;min-height:100vh}
-button,input,textarea,select{font:inherit}button{cursor:pointer}.shell{width:min(1440px,100%);margin:auto;padding:26px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:14px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;color:#06111e;font-weight:900;font-size:20px;box-shadow:0 8px 30px #35d7ef35}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--cyan);font-weight:800}.brand h1{font-size:21px;margin:3px 0}.sub{color:var(--muted);font-size:13px}.top-right{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#0c1726;border-radius:99px;padding:8px 12px;color:#b7c8dc;font-size:12px}.chip b{color:var(--green)}.layout{display:grid;grid-template-columns: minmax(0,1.45fr) minmax(320px,.85fr);gap:18px}.panel{background:linear-gradient(160deg,#121f32ed,#0d1625f2);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 55px #0003;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.muted{color:var(--muted);font-size:13px;line-height:1.5}.upload{border:1px dashed #3d6680;background:#0b1b2a;border-radius:15px;padding:25px;text-align:center;margin:17px 0;transition:.2s}.upload.drag{border-color:var(--cyan);background:#102b3b}.upload .glyph{font-size:28px;margin-bottom:7px}.btn{border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--cyan),#6991ff);color:#071321;font-weight:800}.btn.secondary{background:#17263a;color:#d9e8f8;border:1px solid #2b405a}.btn.ghost{background:transparent;color:#9fc4df;border:1px solid var(--line)}.btn.danger{background:#3a1d2b;color:#ffb5c0;border:1px solid #673044}.btn:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}.stat{background:#0b1422;border:1px solid #1d3045;border-radius:13px;padding:13px}.stat strong{display:block;font-size:22px;margin-bottom:3px}.stat span{font-size:11px;color:var(--muted)}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:17px 0 10px;flex-wrap:wrap}.search{background:#0a1421;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);min-width:190px;outline:none}.search:focus,textarea:focus,select:focus{border-color:var(--cyan)}.table-wrap{overflow:auto;border:1px solid #203248;border-radius:13px;max-height:440px}table{border-collapse:collapse;width:100%;min-width:580px}th,td{text-align:left;padding:12px 11px;border-bottom:1px solid #1b2b3e;font-size:12px}th{position:sticky;top:0;background:#101d2d;color:#9db3c9;z-index:1}td{color:#dce8f5}tr:last-child td{border-bottom:0}.status{font-size:10px;border-radius:99px;padding:4px 7px;background:#273244;color:#c6d3e1}.status.ok{background:#12382f;color:#81edc4}.status.unknown{background:#302b1d;color:#f5d88c}.check{accent-color:var(--cyan);width:16px;height:16px}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:12px;color:#a9bdd2;font-weight:700}.field textarea,.field input,.field select{width:100%;background:#091321;border:1px solid #263950;border-radius:11px;color:var(--text);padding:11px 12px;outline:none}.field textarea{min-height:125px;resize:vertical;line-height:1.5}.preview{white-space:pre-wrap;background:#08121e;border:1px solid #1e354b;border-radius:12px;padding:13px;min-height:80px;color:#cde4f5;font-size:13px;line-height:1.6}.notice{background:#282417;border:1px solid #594b27;color:#e8d9a7;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin:14px 0}.notice strong{color:#ffe8a1}.progress{height:7px;background:#1b2b3e;border-radius:99px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .2s}.empty{text-align:center;padding:34px 12px;color:var(--muted)}.footer{color:#71869d;font-size:11px;text-align:center;margin:20px 0 5px}.hidden{display:none!important}@media(max-width:900px){.layout{grid-template-columns:1fr}.shell{padding:17px}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.top{align-items:flex-start;flex-direction:column}.top-right{width:100%}.panel{padding:15px}.stats{gap:7px}.stat{padding:10px}.stat strong{font-size:19px}.upload{padding:18px}.btn{padding:10px 12px}}
-</style>
-</head>
-<body>
-<div class="shell">
-<header class="top">
- <div class="brand"><div class="logo">X</div><div><div class="eyebrow">LOCAL CONTACT WORKSPACE</div><h1>XHYPER VCF SENDER <span style="color:var(--cyan)">V2</span></h1><div class="sub">Private VCF tools · no account · no database</div></div></div>
- <div class="top-right"><span class="chip"><b>●</b> Local mode</span><span class="chip">Data stays in this browser</span></div>
-</header>
+:root{color-scheme:dark;--bg:#080d18;--panel:#101a2b;--line:#22344b;--text:#edf5ff;--muted:#91a5bc;--cyan:#35d7ef;--blue:#6385ff;--green:#46d6a0;--red:#ff7185}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#102e48 0,transparent 38%),radial-gradient(ellipse at 95% 85%,#201b48 0,transparent 34%),var(--bg);color:var(--text);font:15px Inter,system-ui,Segoe UI,sans-serif;min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer}.shell{width:min(1250px,100%);margin:auto;padding:25px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:13px}.logo{width:47px;height:47px;border-radius:15px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;color:#06111e;font-weight:900;font-size:20px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--cyan);font-weight:800}.brand h1{font-size:21px;margin:3px 0}.sub,.muted{color:var(--muted);font-size:13px;line-height:1.5}.chip{border:1px solid var(--line);background:#0c1726;border-radius:99px;padding:8px 12px;color:#b7c8dc;font-size:12px}.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:17px}.panel{background:linear-gradient(160deg,#121f32ed,#0d1625f2);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 55px #0003;min-width:0}.panel h2{font-size:16px;margin:0 0 5px}.upload{border:1px dashed #3d6680;background:#0b1b2a;border-radius:15px;padding:22px;text-align:center;margin:16px 0}.btn{border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--cyan),#6991ff);color:#071321;font-weight:800}.btn.secondary{background:#17263a;color:#d9e8f8;border:1px solid #2b405a}.btn.danger{background:#3a1d2b;color:#ffb5c0;border:1px solid #673044}.btn:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}.stat{background:#0b1422;border:1px solid #1d3045;border-radius:13px;padding:12px}.stat strong{display:block;font-size:21px}.stat span{font-size:11px;color:var(--muted)}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:12px;color:#a9bdd2;font-weight:700}.field textarea,.field input{width:100%;background:#091321;border:1px solid #263950;border-radius:11px;color:var(--text);padding:11px 12px;outline:none}.field textarea{min-height:115px;resize:vertical;line-height:1.5}.table-wrap{overflow:auto;border:1px solid #203248;border-radius:13px;max-height:390px}table{border-collapse:collapse;width:100%;min-width:370px}th,td{text-align:left;padding:12px 11px;border-bottom:1px solid #1b2b3e;font-size:12px}th{position:sticky;top:0;background:#101d2d;color:#9db3c9}td{color:#dce8f5}.check{accent-color:var(--cyan);width:16px;height:16px}.search{background:#0a1421;border:1px solid var(--line);border-radius:10px;padding:9px 11px;color:var(--text);min-width:150px}.status{font-size:10px;border-radius:99px;padding:4px 7px;background:#273244;color:#c6d3e1}.status.ok{background:#12382f;color:#81edc4}.notice{background:#282417;border:1px solid #594b27;color:#e8d9a7;padding:12px;border-radius:12px;font-size:12px;line-height:1.5;margin:13px 0}.notice strong{color:#ffe8a1}.preview{white-space:pre-wrap;background:#08121e;border:1px solid #1e354b;border-radius:12px;padding:13px;min-height:75px;color:#cde4f5;font-size:13px;line-height:1.6}.progress{height:7px;background:#1b2b3e;border-radius:99px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue))}.log{background:#08121e;border:1px solid #1e354b;border-radius:12px;padding:10px;max-height:150px;overflow:auto;font-size:12px;color:#b8cadc;white-space:pre-wrap}.footer{text-align:center;color:#71869d;font-size:11px;margin:20px}.hidden{display:none!important}@media(max-width:850px){.layout{grid-template-columns:1fr}.shell{padding:16px}}@media(max-width:520px){.top{align-items:flex-start;flex-direction:column}.panel{padding:15px}.stats{gap:6px}.stat{padding:9px}}
+</style></head>
+<body><div class="shell">
+<header class="top"><div class="brand"><div class="logo">X</div><div><div class="eyebrow">LOCAL OPT-IN WORKSPACE</div><h1>XHYPER VCF SENDER <span style="color:var(--cyan)">V2</span></h1><div class="sub">Phone-only contacts · consent-first messaging</div></div></div><span class="chip" id="apiStatus">Checking API setup…</span></header>
 <div class="layout">
 <section class="panel">
- <h2>Contact workspace</h2><div class="muted">Import VCF contacts, review and clean the list, then mark only people who have agreed to receive your message.</div>
- <div class="upload" id="drop">
-  <div class="glyph">📇</div><strong>Drop VCF files here</strong><div class="muted" style="margin:6px 0 13px">Supports .vcf and .vcard · multiple files</div>
-  <input id="files" type="file" accept=".vcf,.vcard,text/vcard" multiple hidden>
-  <button class="btn" id="browse">Choose VCF files</button>
- </div>
- <div class="stats">
-  <div class="stat"><strong id="total">0</strong><span>Total contacts</span></div>
-  <div class="stat"><strong id="valid">0</strong><span>Valid phone formats</span></div>
-  <div class="stat"><strong id="dupes">0</strong><span>Duplicates removed</span></div>
-  <div class="stat"><strong id="consented">0</strong><span>Consent confirmed</span></div>
- </div>
- <div class="toolbar"><div><strong style="font-size:13px">Imported contacts</strong><div class="muted" id="listHint">No contacts loaded yet</div></div><input class="search" id="search" placeholder="Search name or number…" aria-label="Search contacts"></div>
- <div class="table-wrap">
-  <table><thead><tr><th><input class="check" id="selectVisible" type="checkbox" aria-label="Select visible"></th><th>Name</th><th>Phone</th><th>Format</th><th>Consent</th></tr></thead><tbody id="contacts"><tr><td colspan="5"><div class="empty">Upload a VCF file to get started.</div></td></tr></tbody></table>
- </div>
- <div class="row" style="margin-top:13px"><button class="btn secondary" id="export" disabled>Export cleaned VCF</button><button class="btn ghost" id="clear" disabled>Clear contacts</button><span class="muted" id="fileInfo"></span></div>
+<h2>Phone contact list</h2><div class="muted">Import VCF files. Contact names are ignored and never shown or included in messages.</div>
+<div class="upload" id="drop"><div style="font-size:27px">📇</div><strong>Drop VCF files here</strong><div class="muted" style="margin:6px 0 12px">Multiple .vcf / .vcard files supported · phone numbers only</div><input id="files" type="file" accept=".vcf,.vcard,text/vcard" multiple hidden><button class="btn" id="browse">Choose VCF files</button></div>
+<div class="stats"><div class="stat"><strong id="total">0</strong><span>Phone numbers</span></div><div class="stat"><strong id="valid">0</strong><span>Valid formats</span></div><div class="stat"><strong id="approved">0</strong><span>Opt-in confirmed</span></div></div>
+<div class="row" style="justify-content:space-between;margin:14px 0"><div><strong style="font-size:13px">Recipients</strong><div class="muted" id="hint">No contacts loaded</div></div><input class="search" id="search" placeholder="Search phone number"></div>
+<div class="table-wrap"><table><thead><tr><th><input id="all" class="check" type="checkbox" aria-label="Select all visible"></th><th>Phone number</th><th>Format</th><th>Consent</th></tr></thead><tbody id="list"><tr><td colspan="4" class="muted">Import a VCF to begin.</td></tr></tbody></table></div>
+<div class="row" style="margin-top:12px"><button class="btn secondary" id="export" disabled>Export phone-only VCF</button><button class="btn secondary" id="clear" disabled>Clear list</button></div>
+<div class="notice"><strong>Consent requirement:</strong> Tick a recipient only after they have explicitly agreed to receive messages from you. Do not message scraped, purchased, or unrequested contact lists. Remove anyone who opts out.</div>
 </section>
 <aside class="panel">
- <h2>Message studio</h2><div class="muted">Prepare a message and open a chat for one consent-confirmed contact at a time.</div>
- <div class="notice"><strong>WhatsApp availability:</strong> A phone-number format check cannot confirm that a number has WhatsApp. The app will not probe accounts or label numbers as WhatsApp users. Availability is shown as unknown until you confirm it yourself.</div>
- <div class="field"><label for="country">Default country calling code (digits only)</label><input id="country" value="94" inputmode="numeric" maxlength="4"></div>
- <div class="field"><label for="message">Message template</label><textarea id="message" placeholder="Hi {name}, just following up about…"></textarea><div class="muted">Use {name} to insert the contact's name. Keep messages relevant and expected.</div></div>
- <div class="field"><label for="preview">Preview for selected contact</label><div class="preview" id="preview">Select a contact to preview your message.</div></div>
- <div class="row"><button class="btn" id="openChat" disabled>Open next approved chat ↗</button><button class="btn secondary" id="copyMsg" disabled>Copy message</button></div>
- <div class="progress"><i id="progress"></i></div>
- <div class="muted" id="queueText">0 approved contacts in your send queue.</div>
- <div class="notice" style="background:#14251f;border-color:#244b3b;color:#b5e7d1"><strong>Safe workflow:</strong> Each chat opens for your review. You must press Send in WhatsApp yourself. There is no auto-send, account checking, message randomization for ban evasion, or ban-bypass feature.</div>
- <div class="field"><label>Message variants (manual selection)</label><select id="variant"><option value="0">Template 1 — Main message</option><option value="1">Template 2 — Friendly follow-up</option><option value="2">Template 3 — Short reminder</option></select><textarea id="variantText" placeholder="Optional alternative message template" style="min-height:75px"></textarea><button class="btn ghost" id="useVariant">Use selected template</button></div>
-</aside>
-</div>
-<div class="footer">XHYPER VCF SENDER V2 · Local-first · No login · No remote contact storage</div>
-</div>
+<h2>Friendly message studio 💗</h2><div class="muted">No recipient name, no contact-name lookup, and no automatic message variation.</div>
+<div class="field"><label for="country">Default country code (digits only)</label><input id="country" value="94" maxlength="4" inputmode="numeric"></div>
+<div class="field"><label for="message">Message</label><textarea id="message">නමයි ගමයි කියන්නකෝ සෙව් දාගන්න... 😩💗🥺</textarea></div>
+<div class="field"><label>Message preview</label><div class="preview" id="preview">Your message will appear here.</div></div>
+<div class="row"><button class="btn" id="start" disabled>Start approved queue ▶</button><button class="btn secondary" id="pause" disabled>Pause</button><button class="btn danger" id="stop" disabled>Stop</button></div>
+<div class="progress"><i id="bar"></i></div><div class="muted" id="queueState">0 approved recipients ready.</div>
+<div class="notice"><strong>Official API only:</strong> Sending uses the WhatsApp Business Cloud API, not a personal Linked Device. You must configure your own Meta business app, sender number and access token. WhatsApp may require an approved template outside the 24-hour customer-service window.</div>
+<div class="field"><label>Activity log</label><div class="log" id="log">Ready. No messages sent.</div></div>
+</aside></div><div class="footer">XHYPER VCF SENDER V2 · Local-first · Names ignored · No contact upload</div></div>
 <script>
-const $ = id => document.getElementById(id);
-let contacts = [];
-let duplicateCount = 0;
-let approvedQueue = [];
-let queueIndex = 0;
-let activeTemplate = '';
-const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function unfold(text){return text.replace(/\r?\n[ \t]/g,'');}
-function unescapeVcard(value){return value.replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');}
-function parseVcf(text){
- const cards = unfold(text).split(/BEGIN:VCARD/i).slice(1);
- const out=[];
- for(const raw of cards){
-  const body=raw.split(/END:VCARD/i)[0];
-  const lines=body.split(/\r?\n/);
-  let name='', phone='';
-  for(const line of lines){
-   const idx=line.indexOf(':'); if(idx<0) continue;
-   const key=line.slice(0,idx).split(';')[0].toUpperCase();
-   const val=unescapeVcard(line.slice(idx+1).trim());
-   if(key==='FN' && !name) name=val;
-   if(key==='N' && !name){const p=val.split(';').filter(Boolean);name=[p[1],p[0]].filter(Boolean).join(' ');}
-   if(key==='TEL' && !phone) phone=val.replace(/[^+\d]/g,'');
-  }
-  if(phone) out.push({id:crypto.randomUUID(),name:name||'Unknown contact',phone,consent:false,waKnown:false});
- }
- return out;
-}
-function normalizePhone(phone){
- let digits=String(phone).replace(/\D/g,'');
- const cc=$('country').value.replace(/\D/g,'');
- if(!digits) return '';
- if(String(phone).trim().startsWith('+')) return digits;
- if(cc && digits.startsWith('0')) return cc+digits.slice(1);
- if(cc && digits.length<=10 && !digits.startsWith(cc)) return cc+digits;
- return digits;
-}
-function isValid(phone){const n=normalizePhone(phone);return n.length>=8&&n.length<=15;}
-function filtered(){const q=$('search').value.toLowerCase();return contacts.filter(c=>(c.name+' '+c.phone).toLowerCase().includes(q));}
-function render(){
- const rows=filtered();
- $('contacts').innerHTML=rows.length?rows.map(c=>'<tr><td><input class="check row-check" data-id="'+c.id+'" type="checkbox" '+(c.consent?'checked':'')+' aria-label="Consent confirmed for '+escapeHtml(c.name)+'"></td><td>'+escapeHtml(c.name)+'</td><td>'+escapeHtml(c.phone)+'</td><td><span class="status '+(isValid(c.phone)?'ok':'')+'">'+(isValid(c.phone)?'Valid format':'Review')+'</span></td><td><span class="status '+(c.consent?'ok':'unknown')+'">'+(c.consent?'Confirmed':'Not confirmed')+'</span></td></tr>').join(''):'<tr><td colspan="5"><div class="empty">No matching contacts.</div></td></tr>';
- $('total').textContent=contacts.length;
- $('valid').textContent=contacts.filter(c=>isValid(c.phone)).length;
- $('dupes').textContent=duplicateCount;
- $('consented').textContent=contacts.filter(c=>c.consent).length;
- $('listHint').textContent=contacts.length?rows.length+' shown · '+contacts.length+' total':'No contacts loaded yet';
- $('export').disabled=!contacts.length;$('clear').disabled=!contacts.length;
- $('selectVisible').checked=rows.length>0&&rows.every(c=>c.consent);
- approvedQueue=contacts.filter(c=>c.consent&&isValid(c.phone));
- $('queueText').textContent=approvedQueue.length+' approved contacts in your send queue.';
- $('openChat').disabled=!approvedQueue.length||!$('message').value.trim();
- $('copyMsg').disabled=!approvedQueue.length||!$('message').value.trim();
- updatePreview();
-}
-function currentContact(){return approvedQueue[queueIndex%Math.max(approvedQueue.length,1)];}
-function messageFor(c){return $('message').value.replaceAll('{name}',c?.name||'there').trim();}
-function updatePreview(){const c=currentContact();$('preview').textContent=c?messageFor(c):'Select a contact and confirm consent to preview your message.';$('progress').style.width=approvedQueue.length?(Math.min(queueIndex,approvedQueue.length)/approvedQueue.length*100)+'%':'0%';}
-async function importFiles(files){
- for(const file of files){try{const text=await file.text();const parsed=parseVcf(text);const seen=new Set(contacts.map(c=>normalizePhone(c.phone)));for(const c of parsed){const key=normalizePhone(c.phone);if(!key||seen.has(key)){duplicateCount++;continue;}seen.add(key);contacts.push(c);}}catch(e){alert('Could not read '+file.name+': '+e.message);}}
- $('fileInfo').textContent=files.length+' file(s) processed';render();
-}
-$('browse').onclick=()=>$('files').click();
-$('files').onchange=e=>importFiles([...e.target.files]);
-$('drop').ondragover=e=>{e.preventDefault();$('drop').classList.add('drag')};
-$('drop').ondragleave=()=>$('drop').classList.remove('drag');
-$('drop').ondrop=e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files].filter(f=>/\.vcf$|\.vcard$/i.test(f.name)))};
-$('contacts').onchange=e=>{const box=e.target.closest('.row-check');if(!box)return;const c=contacts.find(x=>x.id===box.dataset.id);if(c)c.consent=box.checked;render()};
-$('selectVisible').onchange=e=>{const ids=new Set(filtered().map(c=>c.id));contacts.forEach(c=>{if(ids.has(c.id))c.consent=e.target.checked});render()};
-$('search').oninput=render;
-$('country').oninput=render;
-$('message').oninput=render;
-$('clear').onclick=()=>{if(confirm('Clear all imported contacts from this page?')){contacts=[];duplicateCount=0;queueIndex=0;$('fileInfo').textContent='';render();}};
-$('export').onclick=()=>{
- const lines=['BEGIN:VCARD','VERSION:3.0'];
- const v=contacts.map(c=>'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:'+c.name.replace(/[\r\n]/g,' ')+'\r\nTEL;TYPE=CELL:+'+normalizePhone(c.phone)+'\r\nEND:VCARD').join('\r\n');
- const blob=new Blob([v+'\r\n'],{type:'text/vcard;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='xhyp er-cleaned-contacts.vcf'.replace(' ','');a.click();URL.revokeObjectURL(a.href);
-};
-$('openChat').onclick=()=>{
- const c=currentContact();if(!c)return;
- const msg=messageFor(c);if(!msg)return;
- const url='https://wa.me/'+normalizePhone(c.phone)+'?text='+encodeURIComponent(msg);
- window.open(url,'_blank','noopener,noreferrer');
- queueIndex=Math.min(queueIndex+1,approvedQueue.length);
- updatePreview();$('queueText').textContent='Opened '+Math.min(queueIndex,approvedQueue.length)+' of '+approvedQueue.length+' approved chats. Press Send in WhatsApp yourself.';
-};
-$('copyMsg').onclick=async()=>{const c=currentContact();if(c){await navigator.clipboard.writeText(messageFor(c));$('copyMsg').textContent='Copied ✓';setTimeout(()=>$('copyMsg').textContent='Copy message',1400)}};
-$('useVariant').onclick=()=>{const text=$('variantText').value.trim();if(text){$('message').value=text;render();}};
-$('variant').onchange=()=>{const samples=['Hi {name}, just following up on the information you asked for.','Hello {name}, hope you are doing well. Is this still a good time to connect?','Hi {name}, a quick reminder about our previous conversation.'];$('variantText').value=samples[Number($('variant').value)]||'';};
+const $=id=>document.getElementById(id);let contacts=[],dupes=0,running=false,paused=false,stopRequested=false,position=0;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function unfold(s){return s.replace(/\r?\n[ \t]/g,'')}
+function parseVcf(raw){return unfold(raw).split(/BEGIN:VCARD/i).slice(1).map(card=>{const body=card.split(/END:VCARD/i)[0];let phone='';for(const line of body.split(/\r?\n/)){const i=line.indexOf(':');if(i<0)continue;const key=line.slice(0,i).split(';')[0].toUpperCase();if(key==='TEL'&&!phone)phone=line.slice(i+1).replace(/[^+\d]/g,'')}return phone?{id:crypto.randomUUID(),phone,consent:false}:null}).filter(Boolean)}
+function normalized(raw){let d=String(raw).replace(/\D/g,'');const cc=$('country').value.replace(/\D/g,'');if(String(raw).trim().startsWith('+'))return d;if(cc&&d.startsWith('0'))return cc+d.slice(1);if(cc&&d.length<=10&&!d.startsWith(cc))return cc+d;return d}
+function valid(c){const n=normalized(c.phone);return n.length>=8&&n.length<=15}
+function visible(){const q=$('search').value.trim().toLowerCase();return contacts.filter(c=>c.phone.toLowerCase().includes(q))}
+function approved(){return contacts.filter(c=>c.consent&&valid(c))}
+function log(s){$('log').textContent+='\n'+new Date().toLocaleTimeString()+'  '+s;$('log').scrollTop=$('log').scrollHeight}
+function render(){const rows=visible();$('list').innerHTML=rows.length?rows.map(c=>'<tr><td><input class="check item" data-id="'+c.id+'" type="checkbox" '+(c.consent?'checked':'')+' aria-label="Consent confirmed for '+esc(c.phone)+'"></td><td>+'+esc(normalized(c.phone))+'</td><td><span class="status '+(valid(c)?'ok':'')+'">'+(valid(c)?'Valid format':'Review')+'</span></td><td><span class="status '+(c.consent?'ok':'')+'">'+(c.consent?'Confirmed':'Not confirmed')+'</span></td></tr>').join(''):'<tr><td colspan="4" class="muted">No matching numbers.</td></tr>';$('total').textContent=contacts.length;$('valid').textContent=contacts.filter(valid).length;$('approved').textContent=approved().length;$('hint').textContent=rows.length+' shown · '+contacts.length+' total';$('all').checked=rows.length>0&&rows.every(c=>c.consent);$('export').disabled=!contacts.length;$('clear').disabled=!contacts.length;$('start').disabled=!approved().length||!$('message').value.trim()||running;$('preview').textContent=$('message').value||'Enter a message';$('queueState').textContent=approved().length+' approved recipients ready · '+position+' processed';$('bar').style.width=(contacts.length?position/Math.max(approved().length,1)*100:0)+'%'}
+async function importFiles(files){for(const f of files){try{const parsed=parseVcf(await f.text());const seen=new Set(contacts.map(c=>normalized(c.phone)));for(const c of parsed){const n=normalized(c.phone);if(!n||seen.has(n)){dupes++;continue}seen.add(n);contacts.push(c)}}catch(e){log('Could not read '+f.name)}}render();log('Imported VCF phone numbers. Names were ignored.')}
+$('browse').onclick=()=>$('files').click();$('files').onchange=e=>importFiles([...e.target.files]);$('drop').ondragover=e=>{e.preventDefault();$('drop').style.borderColor='var(--cyan)'};$('drop').ondragleave=()=>$('drop').style.borderColor='';$('drop').ondrop=e=>{e.preventDefault();$('drop').style.borderColor='';importFiles([...e.dataTransfer.files].filter(f=>/\.vcf$|\.vcard$/i.test(f.name)))};
+$('list').onchange=e=>{const b=e.target.closest('.item');if(!b)return;const c=contacts.find(x=>x.id===b.dataset.id);if(c)c.consent=b.checked;render()};$('all').onchange=e=>{const ids=new Set(visible().map(c=>c.id));contacts.forEach(c=>{if(ids.has(c.id))c.consent=e.target.checked});render()};$('search').oninput=render;$('country').oninput=render;$('message').oninput=render;
+$('clear').onclick=()=>{if(running)return;if(confirm('Clear all phone numbers from this page?')){contacts=[];position=0;render();log('Contact list cleared.')}};
+$('export').onclick=()=>{const cards=contacts.map(c=>'BEGIN:VCARD\r\nVERSION:3.0\r\nTEL;TYPE=CELL:+ '+normalized(c.phone)+'\r\nEND:VCARD').join('\r\n').replace(/\+ /g,'+');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([cards+'\r\n'],{type:'text/vcard'}));a.download='xhyp er-phone-only.vcf'.replace(' ','');a.click();URL.revokeObjectURL(a.href)};
+async function sendOne(c){const r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:normalized(c.phone),message:$('message').value.trim(),consentConfirmed:c.consent})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'Send failed');return data}
+async function runQueue(){if(running)return;running=true;paused=false;stopRequested=false;$('start').disabled=true;$('pause').disabled=false;$('stop').disabled=false;const queue=approved();log('Queue started for '+queue.length+' consent-confirmed recipients.');for(let i=position;i<queue.length;i++){while(paused&&!stopRequested)await new Promise(r=>setTimeout(r,250));if(stopRequested)break;const c=queue[i];try{await sendOne(c);position=i+1;log('Accepted by WhatsApp API: +'+normalized(c.phone));}catch(e){log('Stopped at +'+normalized(c.phone)+': '+e.message);if(e.message.includes('wait')){paused=true;i--;continue}break}render();if(i<queue.length-1){let remaining=30;while(remaining>0&&!stopRequested){while(paused&&!stopRequested)await new Promise(r=>setTimeout(r,250));$('queueState').textContent='Next send in '+remaining+' seconds · '+position+'/'+queue.length;await new Promise(r=>setTimeout(r,1000));remaining--}}}running=false;paused=false;$('pause').disabled=true;$('stop').disabled=true;$('start').disabled=!approved().length||!$('message').value.trim();$('queueState').textContent=stopRequested?'Queue stopped.':position>=queue.length?'Queue completed.':'Queue paused or stopped after an error.';log(stopRequested?'Queue stopped by user.':'Queue finished or paused after an error.');render()}
+$('start').onclick=runQueue;$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'Resume':'Pause';log(paused?'Queue paused.':'Queue resumed.')};$('stop').onclick=()=>{stopRequested=true;paused=false;log('Stop requested. Current request will finish first.')};
+fetch('/health').then(r=>r.json()).then(d=>$('apiStatus').textContent=d.configured?'● Cloud API configured':'● Cloud API not configured').catch(()=>$('apiStatus').textContent='● Server unavailable');
 render();
-</script>
-</body>
-</html>
+</script></body></html>
