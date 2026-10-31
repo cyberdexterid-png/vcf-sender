@@ -9,7 +9,6 @@ const AUTH_DIR = path.join(__dirname, "auth_data_local");
 let socket = null;
 let waStatus = "disconnected";
 let qrCodeDataUrl = null;
-let pairedNumber = null;
 let lastError = null;
 let starting = false;
 
@@ -29,11 +28,7 @@ app.get("/api/whatsapp/status", (_req, res) => {
   res.json({ status: waStatus, qrCodeDataUrl, error: lastError });
 });
 
-app.post("/api/whatsapp/pair", async (req, res) => {
-  const phone = String(req.body?.phone || "").replace(/\D/g, "");
-  if (phone.length < 8 || phone.length > 15) {
-    return res.status(400).json({ ok: false, error: "Enter your phone number with country code, digits only." });
-  }
+app.post("/api/whatsapp/pair", async (_req, res) => {
   if (starting || (socket && waStatus === "connected")) {
     return res.status(409).json({ ok: false, error: "A WhatsApp session is already starting or connected." });
   }
