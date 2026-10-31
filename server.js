@@ -3,7 +3,7 @@ const path = require("path");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const HOST = process.env.HOST || "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 const AUTH_DIR = path.join(__dirname, "auth_data_local");
 
 let socket = null;
@@ -153,5 +153,5 @@ app.post("/api/whatsapp/disconnect", async (_req, res) => {
 
 app.listen(PORT, HOST, () => {
   console.log(`XHYPER VCF SENDER V2 running at http://${HOST}:${PORT}`);
-  console.log("Local-only server. Pair only your own WhatsApp account.");
+  console.log("Codespaces-compatible server. Keep forwarded port PRIVATE and pair only your own WhatsApp account.");
 });
