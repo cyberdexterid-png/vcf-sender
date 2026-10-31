@@ -10,6 +10,7 @@ let socket = null;
 let waStatus = "disconnected";
 let qrCodeDataUrl = null;
 let lastError = null;
+let lastDisconnectCode = null;
 let starting = false;
 let manuallyDisconnected = false;
 
@@ -26,14 +27,16 @@ app.get("/health", (_req, res) => {
 
 app.get("/api/whatsapp/status", (_req, res) => {
   res.set("Cache-Control", "no-store");
-  res.json({ status: waStatus, qrCodeDataUrl, error: lastError });
+  res.json({ status: waStatus, qrCodeDataUrl, error: lastError, lastDisconnectCode });
 });
 
 async function startWhatsAppSocket() {
-  const { default: makeWASocket, useMultiFileAuthState } = await import("@whiskeysockets/baileys");
+  const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = await import("@whiskeysockets/baileys");
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+  const { version } = await fetchLatestBaileysVersion();
 
   const currentSocket = makeWASocket({
+    version,
     auth: state,
     printQRInTerminal: false,
     markOnlineOnConnect: false,
@@ -57,12 +60,15 @@ async function startWhatsAppSocket() {
       waStatus = "connected";
       qrCodeDataUrl = null;
       lastError = null;
+      lastDisconnectCode = null;
       starting = false;
     }
 
     if (connection === "close") {
-      const statusCode = lastDisconnect?.error?.output?.statusCode;
+      const statusCode = lastDisconnect?.error?.output?.statusCode ?? lastDisconnect?.error?.statusCode ?? null;
       const reason = lastDisconnect?.error?.message;
+      lastDisconnectCode = statusCode;
+      console.error("[WhatsApp] connection closed", { statusCode, reason, data: lastDisconnect?.error?.data, output: lastDisconnect?.error?.output });
       if (socket === currentSocket) socket = null;
       qrCodeDataUrl = null;
 
@@ -84,7 +90,7 @@ async function startWhatsAppSocket() {
 
       waStatus = "disconnected";
       starting = false;
-      if (reason) lastError = reason;
+      if (reason) lastError = statusCode ? `${reason} (status ${statusCode})` : reason;
     }
 
     if (qr && !state.creds.registered && !manuallyDisconnected) {
@@ -113,6 +119,7 @@ app.post("/api/whatsapp/pair", async (_req, res) => {
   manuallyDisconnected = false;
   qrCodeDataUrl = null;
   lastError = null;
+  lastDisconnectCode = null;
   waStatus = "connecting";
 
   try {
