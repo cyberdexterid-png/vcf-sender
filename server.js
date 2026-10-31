@@ -1,246 +1,157 @@
 const express = require("express");
-const http = require("http");
 const path = require("path");
-const fs = require("fs");
-const { Server } = require("socket.io");
-const pino = require("pino");
-const {
-  default: makeWASocket,
-  useMultiFileAuthState,
-  fetchLatestBaileysVersion
-} = require("@whiskeysockets/baileys");
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
 const PORT = Number(process.env.PORT || 3000);
-const HOST = process.env.HOST || "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 const AUTH_DIR = path.join(__dirname, "auth_data_local");
-const DB_FILE = path.join(__dirname, "database.json");
 
-app.use(express.json({ limit: "1mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+let socket = null;
+let waStatus = "disconnected";
+let qrCodeDataUrl = null;
+let lastError = null;
+let lastDisconnectCode = null;
+let starting = false;
+let manuallyDisconnected = false;
 
-app.get("/", (_req, res) => {
-  res.type("html").send(`<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Safe Sender Pro</title>
-<style>
-*{box-sizing:border-box}
-body{
-  margin:0;min-height:100vh;background:#0b1020;color:#eef2ff;
-  font:16px system-ui,sans-serif;display:grid;place-items:center;padding:24px
-}
-main{
-  width:min(680px,100%);background:#141b2e;
-  border:1px solid #29334e;border-radius:20px;padding:28px;
-  box-shadow:0 20px 70px #0005
-}
-h1{margin:0 0 8px;font-size:clamp(26px,5vw,38px)}
-p{color:#b9c4dc;line-height:1.6}
-.pill{
-  display:inline-block;background:#183d34;color:#a7f3d0;
-  border-radius:999px;padding:6px 12px;font-size:13px
-}
-button{
-  background:#6d5dfc;color:white;border:0;border-radius:10px;
-  padding:12px 16px;font-weight:700;cursor:pointer;margin:4px
-}
-pre{
-  white-space:pre-wrap;overflow-wrap:anywhere;background:#0a0f1d;
-  border-radius:10px;padding:12px;color:#b9c4dc;min-height:64px
-}
-small{color:#94a3b8}
-</style>
-</head>
-<body>
-<main>
-<span class="pill">LOCAL SERVER</span>
-<h1>Safe Sender Pro</h1>
-<p>Server is running. MongoDB and login are disabled.</p>
-<p>
-<button id="check">Check server</button>
-<button id="wa">Connect WhatsApp</button>
-</p>
-<pre id="status">Ready.</pre>
-<small>http://127.0.0.1:3000</small>
-</main>
-<script>
-const statusEl = document.getElementById("status");
-
-document.getElementById("check").onclick = async () => {
-  try {
-    const response = await fetch("/health");
-    const data = await response.json();
-    statusEl.textContent =
-      "Server OK\\n" + JSON.stringify(data, null, 2);
-  } catch (error) {
-    statusEl.textContent = "Error: " + error.message;
-  }
-};
-
-document.getElementById("wa").onclick = () => {
-  statusEl.textContent =
-    "WhatsApp connection request sent.";
-  if (window.io) {
-    const socket = window.io();
-    socket.emit("connect_whatsapp");
-    socket.on("info", message => {
-      statusEl.textContent = message;
-    });
-    socket.on("wa_connected", () => {
-      statusEl.textContent = "WhatsApp connected.";
-    });
-  } else {
-    statusEl.textContent =
-      "Socket.IO client is not loaded.";
-  }
-};
-</script>
-</body>
-</html>`);
-});
+app.disable("x-powered-by");
+app.use(express.json({ limit: "8kb" }));
+app.use(express.static(path.join(__dirname, "public"), {
+  dotfiles: "deny", index: "index.html", etag: true, maxAge: "1h"
+}));
 
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, database: "local-json" });
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, app: "XHYPER VCF SENDER V2", mode: "local-linked-device-qr", apiRequired: false });
 });
 
-function readDatabase() {
-  try {
-    const parsed = JSON.parse(
-      fs.readFileSync(DB_FILE, "utf8")
-    );
+app.get("/api/whatsapp/status", (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ status: waStatus, qrCodeDataUrl, error: lastError, lastDisconnectCode });
+});
 
-    return {
-      users:
-        parsed && typeof parsed.users === "object"
-          && parsed.users ? parsed.users : {},
-      license_keys: Array.isArray(parsed?.license_keys)
-        ? parsed.license_keys : []
-    };
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      console.error("database.json error:", error.message);
+async function startWhatsAppSocket() {
+  const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = await import("@whiskeysockets/baileys");
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+  const { version } = await fetchLatestBaileysVersion();
+
+  const currentSocket = makeWASocket({
+    version,
+    auth: state,
+    printQRInTerminal: false,
+    markOnlineOnConnect: false,
+    syncFullHistory: false
+  });
+  socket = currentSocket;
+
+  // Process events serially so updated login credentials are persisted
+  // before a restart-required (515) close event is handled.
+  currentSocket.ev.process(async (events) => {
+    if (events["creds.update"]) {
+      await saveCreds();
     }
 
-    return { users: {}, license_keys: [] };
-  }
+    const update = events["connection.update"];
+    if (!update) return;
+
+    const { connection, lastDisconnect, qr } = update;
+
+    if (connection === "open") {
+      waStatus = "connected";
+      qrCodeDataUrl = null;
+      lastError = null;
+      lastDisconnectCode = null;
+      starting = false;
+    }
+
+    if (connection === "close") {
+      const statusCode = lastDisconnect?.error?.output?.statusCode ?? lastDisconnect?.error?.statusCode ?? null;
+      const reason = lastDisconnect?.error?.message;
+      lastDisconnectCode = statusCode;
+      console.error("[WhatsApp] connection closed", { statusCode, reason, data: lastDisconnect?.error?.data, output: lastDisconnect?.error?.output });
+      if (socket === currentSocket) socket = null;
+      qrCodeDataUrl = null;
+
+      // WhatsApp normally closes with 515 immediately after a successful
+      // QR link. Re-open the socket using the newly saved credentials.
+      if (statusCode === 515 && !manuallyDisconnected) {
+        waStatus = "connecting";
+        starting = true;
+        lastError = null;
+        try {
+          await startWhatsAppSocket();
+        } catch (error) {
+          waStatus = "error";
+          starting = false;
+          lastError = error?.message || "Could not restart WhatsApp after QR linking.";
+        }
+        return;
+      }
+
+      waStatus = "disconnected";
+      starting = false;
+      if (reason) lastError = statusCode ? `${reason} (status ${statusCode})` : reason;
+    }
+
+    if (qr && !state.creds.registered && !manuallyDisconnected) {
+      try {
+        const QRCode = (await import("qrcode")).default;
+        qrCodeDataUrl = await QRCode.toDataURL(qr, { width: 280, margin: 2 });
+        waStatus = "pairing";
+        starting = false;
+      } catch (error) {
+        lastError = error?.message || "Could not generate QR code.";
+        waStatus = "error";
+        starting = false;
+      }
+    }
+  });
+
+  return state.creds.registered;
 }
 
-function writeDatabase(data) {
-  const temp = `${DB_FILE}.tmp`;
-
-  fs.writeFileSync(
-    temp,
-    JSON.stringify(data, null, 2),
-    { encoding: "utf8", mode: 0o600 }
-  );
-
-  fs.renameSync(temp, DB_FILE);
-}
-
-let waSocket = null;
-let waStarting = false;
-
-async function startWhatsApp(socket) {
-  if (waStarting) {
-    socket.emit("info", "WhatsApp connection is starting.");
-    return;
+app.post("/api/whatsapp/pair", async (_req, res) => {
+  if (starting || (socket && waStatus === "connected")) {
+    return res.status(409).json({ ok: false, error: "A WhatsApp session is already starting or connected." });
   }
 
-  if (waSocket) {
-    socket.emit("info", "WhatsApp is already connecting.");
-    return;
-  }
-
-  waStarting = true;
+  starting = true;
+  manuallyDisconnected = false;
+  qrCodeDataUrl = null;
+  lastError = null;
+  lastDisconnectCode = null;
+  waStatus = "connecting";
 
   try {
-    const { state, saveCreds } =
-      await useMultiFileAuthState(AUTH_DIR);
-
-    const { version } =
-      await fetchLatestBaileysVersion();
-
-    waSocket = makeWASocket({
-      version,
-      auth: state,
-      logger: pino({ level: "silent" }),
-      printQRInTerminal: false
+    const alreadyRegistered = await startWhatsAppSocket();
+    return res.json({
+      ok: true,
+      message: alreadyRegistered
+        ? "Saved WhatsApp session is reconnecting."
+        : "Connection started. Your QR code will appear shortly."
     });
-
-    waSocket.ev.on("creds.update", saveCreds);
-
-    waSocket.ev.on(
-      "connection.update",
-      ({ connection, lastDisconnect, qr }) => {
-        if (qr) {
-          socket.emit(
-            "info",
-            "A QR code was generated. Pairing display needs implementation."
-          );
-        }
-
-        if (connection === "open") {
-          waStarting = false;
-          socket.emit("wa_connected");
-          socket.emit("info", "WhatsApp connected.");
-        }
-
-        if (connection === "close") {
-          socket.emit("info", "WhatsApp disconnected.");
-          waSocket = null;
-          waStarting = false;
-
-          const statusCode =
-            lastDisconnect?.error?.output?.statusCode;
-
-          if (statusCode === 401) {
-            socket.emit(
-              "info",
-              "WhatsApp session logged out."
-            );
-          }
-        }
-      }
-    );
   } catch (error) {
-    waSocket = null;
-    waStarting = false;
-    socket.emit(
-      "info",
-      `WhatsApp connection failed: ${error.message}`
-    );
+    starting = false;
+    waStatus = "error";
+    lastError = error?.message || "Could not start WhatsApp connection.";
+    return res.status(500).json({ ok: false, error: lastError });
   }
-}
-
-io.on("connection", (socket) => {
-  socket.emit("app_ready", {
-    mode: "local-no-login",
-    storage: "database.json",
-    whatsappConnected: Boolean(waSocket?.user)
-  });
-
-  socket.on("connect_whatsapp", async () => {
-    await startWhatsApp(socket);
-  });
-
-  socket.on("get_local_settings", () => {
-    const db = readDatabase();
-
-    socket.emit("local_settings", {
-      licenseKeyCount: db.license_keys.length,
-      storage: "database.json"
-    });
-  });
 });
 
-server.listen(PORT, HOST, () => {
-  console.log(
-    `Local dashboard running at http://${HOST}:${PORT}`
-  );
-  console.log("MongoDB and login are disabled.");
+app.post("/api/whatsapp/disconnect", async (_req, res) => {
+  manuallyDisconnected = true;
+  const activeSocket = socket;
+  socket = null;
+  starting = false;
+  qrCodeDataUrl = null;
+  waStatus = "disconnected";
+  try {
+    if (activeSocket) activeSocket.end(undefined);
+  } catch (_error) {}
+  return res.json({ ok: true, status: waStatus });
+});
+
+app.listen(PORT, HOST, () => {
+  console.log(`XHYPER VCF SENDER V2 running at http://${HOST}:${PORT}`);
+  console.log("Codespaces-compatible server. Keep forwarded port PRIVATE and pair only your own WhatsApp account.");
 });
